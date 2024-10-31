@@ -1,71 +1,39 @@
-
-Script de Backup para Banco de Dados PostgreSQL
-
-Este script realiza o backup de um banco de dados PostgreSQL e salva o arquivo com um nome baseado na data e hora atuais. Além disso, ele armazena o nome do arquivo de backup mais recente em um arquivo de texto para ser utilizado posteriormente no processo de restauração.
+Backup de Bancos de Dados PostgreSQL
+Este repositório contém um script Bash para realizar backups automáticos de bancos de dados PostgreSQL. O script conecta-se ao servidor PostgreSQL, lista todos os bancos de dados não-template e cria arquivos de backup para cada um deles.
 
 Pré-requisitos
-
-Antes de utilizar o script, certifique-se de que o seguinte está configurado corretamente:
-
-- PostgreSQL instalado e em execução na máquina onde o backup será realizado.
-- O pg_dump deve estar disponível (vem com a instalação do PostgreSQL).
-- Acesso ao banco de dados PostgreSQL com as permissões necessárias para realizar o backup.
-
-Variáveis Utilizadas
-
-- DB_NAME: Nome do banco de dados a ser feito o backup (neste caso, usuarios).
-- PGPASSWORD: Senha do usuário do PostgreSQL, definida temporariamente como variável de ambiente.
-
-Estrutura do Script
-
-1. Nome do Banco de Dados
-O nome do banco de dados é definido com a variável DB_NAME. Por padrão, o banco de dados alvo é o banco usuarios:
-
-DB_NAME="usuarios"
-
-2. Definir o Nome do Arquivo de Backup
-O nome do arquivo de backup será gerado automaticamente com base no nome do banco e na data/hora atuais:
-
-BACKUP_FILE="backup_${DB_NAME}_$(date +%Y%m%d_%H%M%S).sql"
-
-3. Definir a Senha do PostgreSQL
-A senha para o usuário PostgreSQL é temporariamente definida como uma variável de ambiente para facilitar a execução do comando pg_dump:
-
-
-Nota: Para questões de segurança, recomenda-se não deixar a senha exposta diretamente no código.
-
-4. Criar o Backup
-O comando pg_dump é utilizado para criar o backup do banco de dados, conectando-se via TCP/IP na máquina local (127.0.0.1):
-
-pg_dump -h 127.0.0.1 -U lima -d "$DB_NAME" -f "$BACKUP_FILE"
-
-Após a execução bem-sucedida, o script exibe uma mensagem com o nome do arquivo de backup gerado.
-
-5. Armazenar o Nome do Último Backup
-O nome do arquivo de backup mais recente é salvo no arquivo ultimo_backup.txt para referência futura, como no processo de restauração:
-
-echo "$BACKUP_FILE" > ultimo_backup.txt
-
+PostgreSQL instalado.
+Acesso ao usuário PostgreSQL com permissões para fazer backups (neste caso, o usuário padrão postgres).
 Como Usar
+Clone o Repositório:
 
-1. Executar o Script de Backup
+bash
+Copiar código
+git clone https://seu-repositorio.git
+cd seu-repositorio
+Configure o Script:
 
-1. Clone o repositório (se aplicável) ou baixe o script.
-2. Garanta que o script tem permissão de execução:
+O script é configurado para usar o usuário postgres. Se necessário, altere a variável PGUSER no script para outro usuário com permissões de backup.
 
-    chmod +x backup.sh
+bash
+Copiar código
+PGUSER="seu_usuario"
+Execute o Script:
 
-3. Execute o script de backup:
+Para executar o script, utilize o comando:
 
-    ./backup.sh
+bash
+Copiar código
+chmod +x backup_script.sh
+./backup_script.sh
+O script irá:
 
-O arquivo de backup será gerado no diretório onde o script foi executado, e o nome do último backup será salvo no arquivo ultimo_backup.txt.
+Listar todos os bancos de dados que não são templates.
+Criar um backup para cada banco de dados, salvando os arquivos no formato backup_<nome_do_banco>_<data_e_hora>.sql.
+Armazenar o nome do arquivo de backup mais recente no arquivo ultimo_backup.txt para uso futuro.
+Saída
+Os backups serão salvos no diretório atual com o seguinte formato de nome:
 
-2. Restaurar o Backup
-
-Para restaurar o backup criado, você pode utilizar um script de restauração separado (como restore.sh), que lê o nome do último backup salvo no arquivo ultimo_backup.txt e o utiliza no comando de restauração do PostgreSQL.
-
-Observações
-
-- Modifique as variáveis conforme necessário, como o nome do banco de dados, o host ou a senha.
-- É recomendável configurar uma política de segurança adequada para proteger a senha do banco de dados.
+Copiar código
+backup_nome_do_banco_YYYYMMDD_HHMMSS.sql
+Além disso, um arquivo ultimo_backup.txt será criado, contendo o nome do backup mais recente.
